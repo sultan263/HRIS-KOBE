@@ -1,0 +1,72 @@
+<div id="view-Absensi" class="page-view" style="display: none;">
+    
+    <div class="d-flex justify-content-between align-items-start mb-4 border-bottom pb-3">
+        <div>
+            <h4 class="fw-bold text-dark m-0"><i class="fa-solid fa-clock text-primary me-2"></i> Dashboard Absensi & Cuti</h4>
+            <p class="text-muted mt-1">Monitoring kehadiran real-time dan manajemen perizinan karyawan.</p>
+        </div>
+    </div>
+    
+    <div class="row g-3 mb-4">
+        <div class="col-md-3 col-6">
+            <div class="card bg-primary text-white shadow-sm border-0 h-100">
+                <div class="card-body text-center p-3">
+                    <h6 class="card-title mb-2" style="font-size:0.8rem;"><i class="fa-solid fa-user-check"></i> HADIR</h6>
+                    <h3 class="fw-bold mb-0" id="absensi-stat-hadir">0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card bg-warning text-dark shadow-sm border-0 h-100">
+                <div class="card-body text-center p-3">
+                    <h6 class="card-title mb-2" style="font-size:0.8rem;"><i class="fa-solid fa-plane-departure"></i> CUTI</h6>
+                    <h3 class="fw-bold mb-0" id="absensi-stat-cuti">0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card bg-danger text-white shadow-sm border-0 h-100">
+                <div class="card-body text-center p-3">
+                    <h6 class="card-title mb-2" style="font-size:0.8rem;"><i class="fa-solid fa-notes-medical"></i> SAKIT/IZIN</h6>
+                    <h3 class="fw-bold mb-0" id="absensi-stat-izin">0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6">
+            <div class="card bg-dark text-white shadow-sm border-0 h-100">
+                <div class="card-body text-center p-3">
+                    <h6 class="card-title mb-2" style="font-size:0.8rem;"><i class="fa-solid fa-user-clock"></i> TERLAMBAT</h6>
+                    <h3 class="fw-bold mb-0" id="absensi-stat-late">0</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 fw-bold text-dark"><i class="fa-solid fa-list me-2"></i> Log Kehadiran Terkini</h6>
+            <button class="btn btn-sm btn-outline-primary" onclick="loadAbsensiData()">
+                <i class="fa-solid fa-rotate me-1"></i> Refresh Data
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle" id="tableAbsensi">
+                    <thead class="table-light">
+                        <tr>
+                            <th>NRPP</th>
+                            <th>Nama Karyawan</th>
+                            <th>Jam Masuk</th>
+                            <th>Jam Pulang</th>
+                            <th>Status</th>
+                            <th>Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyAbsensi">
+                        <tr><td colspan="6" class="text-center text-muted">Belum ada data absensi untuk hari ini.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
