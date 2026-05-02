@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HRIS KOBE 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <?!= include('Css'); ?>
+    <!-- Library untuk Download PDF Langsung -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <div id="login-wrapper" style="display: none;"> 
+        <?!= include('View_Login'); ?> 
+    </div>
+
+    <div id="app-wrapper" style="display: none;">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <i class="fa-solid fa-building-user me-2"></i><span>HRIS KOBE</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="active" onclick="navigateTo('Dashboard')">
+                    <div><i class="fa-solid fa-chart-pie me-2" style="width: 25px;"></i><span>Dashboard</span></div>
+                </li>
+                
+                <li>
+                    <div class="d-flex justify-content-between align-items-center w-100" data-bs-toggle="collapse" data-bs-target="#menuKaryawan" style="cursor: pointer;">
+                        <span><i class="fa-solid fa-users me-2" style="width: 25px;"></i> Data Karyawan</span>
+                        <i class="fa-solid fa-chevron-down fs-xs"></i>
+                    </div>
+                    <div class="collapse show" id="menuKaryawan">
+                        <ul class="submenu">
+                            <li onclick="filterTable('Semua')">Semua Karyawan</li>
+                            <li onclick="filterTable('Tetap')">Karyawan Tetap</li>
+                            <li onclick="filterTable('Kontrak')">Karyawan Kontrak</li>
+                            <li>
+                                <div class="d-flex justify-content-between align-items-center w-100" data-bs-toggle="collapse" data-bs-target="#subMenuMekanik" style="cursor: pointer;">
+                                    <span>Mekanik</span> <i class="fa-solid fa-chevron-down fs-xs"></i>
+                                </div>
+                                <div class="collapse" id="subMenuMekanik">
+                                    <ul class="submenu-inner" style="list-style: none; padding-left: 10px;">
+                                        <li onclick="filterTable('Mekanik Service')">Mekanik Service</li>
+                                        <li onclick="filterTable('Mekanik Refurbish')">Mekanik Refurbish</li>
+                                        <li>
+                                            <div class="d-flex justify-content-between align-items-center w-100" data-bs-toggle="collapse" data-bs-target="#subMenuRental" style="cursor: pointer;">
+                                                <span>Mekanik Rental</span> <i class="fa-solid fa-chevron-down fs-xs"></i>
+                                            </div>
+                                            <div class="collapse" id="subMenuRental">
+                                                <ul class="submenu-inner-plus" style="list-style: none; padding-left: 10px;">
+                                                    <li onclick="filterTable('FMC')">Mekanik FMC</li>
+                                                    <li onclick="filterTable('Satelit')">Mekanik Satelit</li>
+                                                </ul>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+<li>
+    <div class="d-flex justify-content-between align-items-center w-100" data-bs-toggle="collapse" data-bs-target="#menuAbsensi" style="cursor: pointer;">
+        <span><i class="fa-solid fa-clock me-2" style="width: 25px;"></i> Absensi & Cuti</span>
+        <i class="fa-solid fa-chevron-down fs-xs"></i>
+    </div>
+    
+    <div class="collapse" id="menuAbsensi">
+        <ul class="submenu">
+            <li onclick="navigateTo('Absensi')">
+                <i class="fas fa-chart-line me-2 text-success"></i> Dashboard Absensi
+            </li>
+            
+            <li onclick="navigateTo('edit-absensi')">
+                <i class="fas fa-edit me-2 text-info"></i> Edit / Tambah Absensi
+            </li>
+            <li onclick="navigateTo('kelola-libur')">
+                <i class="fas fa-calendar-day me-2 text-danger"></i> Kelola Hari Libur
+            </li>
+            <li onclick="navigateTo('rekap-all')">
+                <i class="fas fa-list me-2 text-secondary"></i> Rekap Absensi All
+            </li>
+            <li onclick="navigateTo('rekap-summary')">
+                <i class="fas fa-user-clock me-2 text-secondary"></i> Summary Per Karyawan
+            </li>
+            <li onclick="navigateTo('laporan-absensi')">
+                <i class="fas fa-print me-2 text-secondary"></i> Cetak Laporan / PDF
+            </li>
+            <li onclick="navigateTo('variabel-gaji')">
+                <i class="fas fa-file-excel me-2 text-warning"></i> Variabel Gaji
+            </li>
+        </ul>
+    </div>
+</li>
+
+                <li>
+                    <div class="d-flex justify-content-between align-items-center w-100" data-bs-toggle="collapse" data-bs-target="#menuAsuransi" style="cursor: pointer;">
+                        <span><i class="fa-solid fa-shield-heart me-2" style="width: 25px;"></i> Jaminan & Asuransi</span>
+                        <i class="fa-solid fa-chevron-down fs-xs"></i>
+                    </div>
+                    <div class="collapse" id="menuAsuransi">
+                        <ul class="submenu">
+                            <li onclick="showAlert('Menu BPJS Kesehatan')">BPJS Kesehatan</li>
+                            <li onclick="showAlert('Menu BPJS TKU')">BPJS TKU</li>
+                            <li onclick="showAlert('Menu Asuransi')">Asuransi</li>
+                        </ul>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="d-flex justify-content-between align-items-center w-100" data-bs-toggle="collapse" data-bs-target="#menuKlaim" style="cursor: pointer;">
+                        <span><i class="fa-solid fa-file-medical me-2" style="width: 25px;"></i> Klaim Karyawan</span>
+                        <i class="fa-solid fa-chevron-down fs-xs"></i>
+                    </div>
+                    <div class="collapse" id="menuKlaim">
+                        <ul class="submenu">
+                            <li onclick="openKlaimPersalinanForm()">Klaim Persalinan</li>
+                            <li onclick="openKlaimForm('Pemeriksaan Kehamilan')">Klaim Pemeriksaan Kehamilan</li>
+                            <li onclick="openKacamataForm()">Klaim Kacamata</li>
+                            <li onclick="openKlaimGigiForm()">Klaim Gigi</li>
+                            <li onclick="openKlaimKBForm()">Klaim KB</li>
+                            <li onclick="openPrintMenu()">Print Laporan</li>
+                        </ul>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="d-flex justify-content-between align-items-center w-100" data-bs-toggle="collapse" data-bs-target="#menuKompensasi" style="cursor: pointer;">
+                        <span><i class="fa-solid fa-hand-holding-dollar me-2" style="width: 25px;"></i> Komp & Tunjang</span>
+                        <i class="fa-solid fa-chevron-down fs-xs"></i>
+                    </div>
+                    <div class="collapse" id="menuKompensasi">
+                        <ul class="submenu">
+                            <li onclick="showAlert('Loan Karyawan')">Loan Karyawan</li>
+                            <li onclick="showAlert('Suka Duka')">Suka Duka</li>
+                        </ul>
+                    </div>
+                </li>
+                
+                <li onclick="loadMonitoringKlaim()">
+                    <div><i class="fa-solid fa-desktop me-2" style="width: 25px;"></i><span>Monitoring Klaim</span></div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="main-content" id="main-content">
+            <nav class="topbar d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-light d-md-none me-3" id="toggleSidebar"><i class="fa-solid fa-bars"></i></button>
+                    <h4 class="mb-0 text-dark fw-bold" id="page-title">Dashboard</h4>
+                </div>
+                <div class="user-profile d-flex align-items-center">
+                    <div class="me-3 text-end d-none d-md-block">
+                        <div class="fw-bold fs-6">Super Admin</div>
+                        <div class="text-muted" style="font-size: 0.8rem;">HR Department</div>
+                    </div>
+                    <img src="https://ui-avatars.com/api/?name=Admin+KOBE&background=10b981&color=fff" class="rounded-circle shadow-sm" width="40">
+                    <button class="btn btn-sm btn-outline-danger ms-3 rounded-circle" onclick="logout()" title="Logout" style="width: 35px; height: 35px;"><i class="fa-solid fa-power-off"></i></button>
+                </div>
+            </nav>
+
+            <div class="content-area mt-4" id="app-content">
+                <div class="text-center mt-5" id="loading-screen">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2 text-muted">Memuat Sistem HRIS...</p>
+                </div>
+                
+                <?!= include('View_Dashboard'); ?>
+                <?!= include('View_Karyawan'); ?>
+                <?!= include('View_Klaim'); ?>
+                <?!= include('View_Klaim_Kacamata'); ?>
+                <?!= include('View_Klaim_Gigi'); ?>
+                <?!= include('View_Klaim_Persalinan'); ?>
+                <?!= include('View_Klaim_KB'); ?>
+                <?!= include('View_Monitoring_Klaim'); ?>
+                <?!= include('View_Print'); ?>
+                <?!= include('View_Absensi'); ?>
+                <div id="view-edit-absensi" class="page-view" style="display: none;">
+                    
+                    <div class="mb-3">
+                        <button class="btn btn-secondary btn-sm shadow-sm" onclick="navigateTo('Absensi')">
+                            <i class="fas fa-arrow-left me-1"></i> Kembali ke Dashboard Absensi
+                        </button>
+                    </div>
+                    
+                    <div class="card shadow-sm border-0 mb-3">
+                        <div class="card-body bg-white rounded py-2">
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-3">
+                                    <label class="small fw-bold">Perusahaan:</label>
+                                    <select id="eaPerusahaan" class="form-select form-select-sm select-pt-all">
+                                        <option value="">-- Pilih Perusahaan --</option>
+                                        <option value="KOBE">Kobexindo Tractors Tbk</option>
+                                        </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="small fw-bold">Tanggal Absensi:</label>
+                                    <input type="date" id="eaTgl" class="form-control form-control-sm border-info">
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-info btn-sm w-100 text-white fw-bold shadow-sm" onclick="loadEditAbsensi()">
+                                        <i class="fas fa-search me-1"></i> Tampilkan
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="small fw-bold text-info">Pencarian Nama:</label>
+                                    <input type="text" id="searchEditAbsen" class="form-control form-control-sm border-info border-2" placeholder="Nama/NRPP..." onkeyup="filterTabel('searchEditAbsen', 'tblEditAbsensi')">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm border-0" id="areaEditAbsensi" style="display: none;">
+                        <div class="card-header bg-info text-white fw-bold py-3" style="font-size: 0.95rem;">
+                            <i class="fas fa-edit me-2"></i> Kelola Absensi Karyawan
+                        </div>
+                        <div class="card-body table-responsive p-0">
+                            <table class="table table-bordered table-hover mb-0 text-center" id="tblEditAbsensi">
+                                <thead class="table-dark align-middle">
+                                    <tr>
+                                        <th width="5%">No</th>
+                                        <th width="15%">NRPP</th>
+                                        <th width="30%">Nama</th>
+                                        <th width="15%">Jam Masuk</th>
+                                        <th width="15%">Jam Keluar</th>
+                                        <th width="10%">Status</th>
+                                        <th width="10%">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="align-middle" style="font-size:13px;" id="tbodyEditAbsensi">
+                                    <tr><td colspan="7" class="text-muted py-4">Silakan pilih perusahaan dan tanggal, lalu klik Tampilkan.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-kelola-libur" class="page-view" style="display: none;">
+                    
+                    <div class="mb-3">
+                        <button class="btn btn-secondary btn-sm shadow-sm" onclick="navigateTo('Absensi')">
+                            <i class="fas fa-arrow-left me-1"></i> Kembali ke Dashboard Absensi
+                        </button>
+                    </div>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-4">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-header bg-danger text-white fw-bold py-2">
+                                    <i class="fas fa-plus me-2"></i> Seting Hari Libur Baru
+                                </div>
+                                <div class="card-body bg-white rounded">
+                                    <div class="mb-3">
+                                        <label class="small fw-bold">Pilih Tanggal:</label>
+                                        <input type="date" id="liburTgl" class="form-control border-danger">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="small fw-bold">Status (LN / CB):</label>
+                                        <select id="liburStat" class="form-select border-danger">
+                                            <option value="LN">Libur Nasional (LN)</option>
+                                            <option value="CB">Cuti Bersama (CB)</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-4">
+                                        <label class="small fw-bold">Keterangan (Catatan):</label>
+                                        <input type="text" id="liburKet" class="form-control border-danger" placeholder="Misal: Tahun Baru / Lebaran">
+                                    </div>
+                                    <button id="btnSaveLibur" class="btn btn-danger w-100 fw-bold shadow-sm" onclick="saveLibur()">
+                                        <i class="fas fa-save me-1"></i> Simpan Ke Kalender
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-8">
+                            <div class="card shadow-sm border-0">
+                                <div class="card-header bg-dark text-white fw-bold py-2 d-flex justify-content-between align-items-center">
+                                    <div><i class="fas fa-calendar-alt me-2"></i> Kalender Libur Nasional & Cuti Bersama</div>
+                                    <button class="btn btn-sm btn-outline-light" onclick="loadDataLibur()"><i class="fas fa-sync-alt"></i></button>
+                                </div>
+                                <div class="card-body table-responsive p-0">
+                                    <table class="table table-hover table-bordered mb-0 text-center align-middle" id="tblKelolaLibur">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th width="10%">No</th>
+                                                <th width="20%">Tanggal</th>
+                                                <th width="20%">Status</th>
+                                                <th width="40%">Keterangan</th>
+                                                <th width="10%">Aksi</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbodyKelolaLibur">
+                                            <tr><td colspan="5" class="text-muted py-4">Belum ada data hari libur yang dimuat.</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="view-rekap-all" class="page-view" style="display: none;">
+    
+    <div class="mb-3">
+        <button class="btn btn-secondary btn-sm shadow-sm" onclick="navigateTo('Absensi')">
+            <i class="fas fa-arrow-left me-1"></i> Kembali ke Dashboard Absensi
+        </button>
+    </div>
+    
+<div class="card shadow-sm border-0 mb-3">
+        <div class="card-body bg-white rounded py-2">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="small fw-bold">Perusahaan:</label>
+                    <select id="raPerusahaan" class="form-select form-select-sm select-pt-all">
+                        <option value="">-- Pilih Perusahaan --</option>
+                        <!-- KODE BARU: Opsi All Perusahaan -->
+                        <option value="ALL">All Perusahaan</option> 
+                        <option value="KOBE">Kobexindo Tractors Tbk</option>
+                        <option value="KEX">Kobexindo Equipment</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="small fw-bold">Mulai:</label>
+                    <input type="date" id="raStart" class="form-control form-control-sm border-primary">
+                </div>
+                <div class="col-md-2">
+                    <label class="small fw-bold">Selesai:</label>
+                    <input type="date" id="raEnd" class="form-control form-control-sm border-primary">
+                </div>
+                <div class="col-md-5">
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary btn-sm flex-grow-1 shadow-sm fw-bold" onclick="loadCrosstabRekap()">
+                            <i class="fas fa-search me-1"></i> Tampilkan
+                        </button>
+                        <button class="btn btn-success btn-sm flex-grow-1 shadow-sm fw-bold" onclick="downloadCrosstabExcel()">
+                            <i class="fas fa-file-excel me-1"></i> Export Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0" id="areaCrosstab" style="display: none;">
+        <div class="sticky-crosstab-title px-4 pt-3 pb-2 border-bottom">
+            <h6 id="ctJudulPT" class="fw-bold mb-1 text-primary">PT. KOBEXINDO EQUIPMENT</h6>
+            <p class="mb-0 text-muted" style="font-size: 0.85rem;">Periode : <span id="ctPeriode" class="fw-bold">-</span></p>
+        </div>
+        
+        <div class="card-body p-0 table-responsive" style="max-height: 65vh; overflow: auto; width: 100%;">
+            <table class="table table-sm table-bordered table-hover text-center align-middle mb-0" id="tblCrosstab">
+                <thead class="table-dark" id="theadCrosstab" style="position: sticky; top: 0; z-index: 10;">
+                    </thead>
+                <tbody style="font-size: 12px; white-space: nowrap;" id="tbodyCrosstab">
+                    <tr><td colspan="10" class="text-muted py-4">Silakan pilih parameter dan klik Tampilkan.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<div id="view-rekap-summary" class="page-view no-print" style="display: none;">
+    
+    <div class="mb-3">
+        <button class="btn btn-secondary btn-sm shadow-sm" onclick="navigateTo('Absensi')">
+            <i class="fas fa-arrow-left me-1"></i> Kembali ke Dashboard Absensi
+        </button>
+    </div>
+    
+    <div class="card shadow-sm border-0 mb-3">
+        <div class="card-body bg-white rounded py-2">
+            <div class="row g-2 align-items-start">
+                
+                <div class="col-md-5">
+                    <label class="small fw-bold text-dark">Pilih Karyawan:</label>
+                    <select id="rsPerusahaanFilter" class="form-select form-select-sm mb-2 select-pt-all" onchange="filterCheckboxKaryawan()">
+                        <option value="">-- Semua Perusahaan --</option>
+                        <option value="KOBE">Kobexindo Tractors Tbk</option>
+                        <option value="KEX">Kobexindo Equipment</option>
+                    </select>
+                    
+                    <input type="text" id="rsSearchKaryawan" class="form-control form-control-sm mb-1 border-primary border-2" placeholder="Cari nama karyawan..." onkeyup="filterCheckboxList()">
+                    
+                    <div class="border p-2 rounded bg-light mt-2" style="max-height: 120px; overflow-y: auto;" id="rsCheckboxContainer">
+                        <div class="text-muted small text-center py-2">Silakan pilih perusahaan terlebih dahulu...</div>
+                    </div>
+                    
+                    <div class="mt-2 px-2 py-1 bg-dark text-white rounded d-flex align-items-center">
+                        <input type="checkbox" id="chkSelectAll" class="form-check-input me-2 mt-0" onchange="toggleAllCheckboxes(this)">
+                        <label for="chkSelectAll" class="small fw-bold cursor-pointer mb-0">PILIH SEMUA KARYAWAN TERFILTER</label>
+                    </div>
+                </div>
+                
+                <div class="col-md-7">
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label class="small fw-bold">Tanggal Mulai:</label>
+                            <input type="date" id="rsStart" class="form-control form-control-sm mb-2 border-dark">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="small fw-bold">Tanggal Selesai:</label>
+                            <input type="date" id="rsEnd" class="form-control form-control-sm border-dark">
+                        </div>
+                        <div class="col-md-12 mt-4">
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary btn-sm flex-grow-1 py-2 shadow-sm fw-bold" onclick="loadRekapSummaryMulti()">
+                                    <i class="fas fa-search me-1"></i> Tampilkan
+                                </button>
+                                <button class="btn btn-success btn-sm flex-grow-1 py-2 shadow-sm fw-bold" onclick="downloadRekapSummaryExcel()">
+                                    <i class="fas fa-file-excel me-1"></i> Export Excel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mt-3" id="areaRekapSummary">
+        <div class="card-header bg-dark text-white fw-bold py-3" style="font-size: 0.95rem;">
+            <i class="fas fa-stopwatch me-2"></i> Summary Kehadiran Karyawan (Total Keterlambatan)
+        </div>
+        <div class="card-body table-responsive p-0">
+            <table class="table table-bordered border-dark table-hover mb-0 text-center" id="tblRekapSummary">
+                <thead class="table-dark align-middle">
+                    <tr>
+                        <th>Periode</th>
+                        <th>NRPP</th>
+                        <th>Nama</th>
+                        <th>Divisi</th>
+                        <th title="Hadir">H</th>
+                        <th title="Sakit">S</th>
+                        <th title="Cuti">C</th>
+                        <th title="Potong Gaji / Alpa">PG</th>
+                        <th>TOTAL KETERLAMBATAN</th>
+                    </tr>
+                </thead>
+                <tbody class="align-middle" style="font-size: 0.9rem;" id="tbodyRekapSummary">
+                    <tr><td colspan="9" class="text-muted py-4">Pilih karyawan dan rentang tanggal untuk melihat summary.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div id="view-laporan-absensi" class="page-view no-print" style="display: none;">
+    
+    <div class="mb-3">
+        <button class="btn btn-secondary btn-sm shadow-sm" onclick="navigateTo('Absensi')">
+            <i class="fas fa-arrow-left me-1"></i> Kembali ke Dashboard Absensi
+        </button>
+    </div>
+    
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body bg-white rounded">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="small fw-bold">Perusahaan:</label>
+                    <select id="lapPerusahaan" class="form-select form-select-sm select-pt-single">
+                        <option value="">-- Pilih --</option>
+                        <option value="KOBE">Kobexindo Tractors Tbk</option>
+                        <option value="KEX">Kobexindo Equipment</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="small fw-bold">Ketik Nama/NRPP:</label>
+                    <input type="text" id="lapKaryawan" list="listKaryawanSingle" class="form-control form-control-sm border-primary" placeholder="Cari karyawan...">
+                    <datalist id="listKaryawanSingle">
+                        </datalist>
+                </div>
+                <div class="col-md-2">
+                    <label class="small fw-bold">Mulai:</label>
+                    <input type="date" id="lapStart" class="form-control form-control-sm border-primary">
+                </div>
+                <div class="col-md-2">
+                    <label class="small fw-bold">Selesai:</label>
+                    <input type="date" id="lapEnd" class="form-control form-control-sm border-primary">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-primary btn-sm w-100 shadow-sm fw-bold" onclick="loadLaporan()">
+                        <i class="fas fa-file-invoice me-1"></i> Pratinjau
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="printArea" class="doc-preview bg-white shadow-sm p-4 rounded border" style="display: none;">
+        
+        <div class="text-center mb-4 pb-2 border-bottom border-2 border-dark print-header">
+            <h4 id="kopPerusahaan" class="fw-bold mb-1 text-uppercase text-primary" style="font-size: 18px; letter-spacing: 1px;">PT. KOBEXINDO TRACTORS TBK</h4>
+            <h5 class="fw-bold mb-0 text-decoration-underline text-dark" style="font-size: 15px;">LAPORAN RINCIAN KEHADIRAN KARYAWAN</h5>
+        </div>
+        
+        <div class="row mb-3 text-dark report-identity" style="font-size: 13px; font-weight: bold;">
+            <div class="col-7">
+                <table class="table-borderless table-sm w-100">
+                    <tr><td width="30%">NRPP</td><td width="2%">:</td><td><span id="lblNRPP">-</span></td></tr>
+                    <tr><td>NAMA KARYAWAN</td><td>:</td><td><span id="lblNama">-</span></td></tr>
+                    <tr><td>GOL</td><td>:</td><td><span id="lblGol">-</span></td></tr>
+                    <tr><td>STATUS</td><td>:</td><td><span id="lblStatus">-</span></td></tr>
+                </table>
+            </div>
+            <div class="col-5">
+                <table class="table-borderless table-sm w-100">
+                    <tr><td width="35%">JABATAN</td><td width="2%">:</td><td><span id="lblJabatan">-</span></td></tr>
+                    <tr><td>DEPT</td><td>:</td><td><span id="lblDept">-</span></td></tr>
+                    <tr><td>DIVISI</td><td>:</td><td><span id="lblDivisi">-</span></td></tr>
+                    <tr><td>PERIODE</td><td>:</td><td><span id="lblPeriode">-</span></td></tr>
+                </table>
+            </div>
+        </div>
+        
+        <table class="table table-bordered border-dark table-sm text-dark report-table mb-3" id="tabelLaporan">
+            <thead class="text-center align-middle fw-bold bg-light">
+                <tr>
+                    <th width="4%">NO</th>
+                    <th width="10%">HARI</th>
+                    <th width="13%">TANGGAL</th>
+                    <th width="11%">JAM MASUK</th>
+                    <th width="11%">JAM KELUAR</th>
+                    <th width="15%">KETERLAMBATAN</th>
+                    <th width="9%">STATUS</th>
+                    <th width="27%">DURASI JAM</th>
+                </tr>
+            </thead>
+            <tbody class="text-center align-middle" style="font-size: 12px;" id="tbodyLaporan">
+                <tr><td colspan="8" class="text-muted py-4">Data belum dimuat.</td></tr>
+            </tbody>
+        </table>
+        
+        <div class="row mt-4 pt-2 text-dark footer-section" style="page-break-inside: avoid;">
+            <div class="col-12 mb-4">
+                <table class="table table-bordered border-dark table-sm mb-0 report-table text-center" style="font-size: 11px;">
+                    <thead class="bg-light">
+                        <tr><th colspan="7" class="py-2">REKAPITULASI KEHADIRAN</th></tr>
+                        <tr>
+                            <th width="14%">HADIR (H)</th>
+                            <th width="14%">SAKIT (S)</th>
+                            <th width="14%">CUTI (C)</th>
+                            <th width="14%">ST</th>
+                            <th width="14%">PG / ALPA</th>
+                            <th width="14%">VISIT CUST</th>
+                            <th width="16%">HARI KERJA</th>
+                        </tr>
+                    </thead>
+                    <tbody class="fw-bold" style="font-size: 13px;">
+                        <tr>
+                            <td><span id="lblTotHadir">0</span></td>
+                            <td><span id="lblTotSakit">0</span></td>
+                            <td><span id="lblTotCuti">0</span></td>
+                            <td><span id="lblTotST">0</span></td>
+                            <td><span id="lblTotPG">0</span></td>
+                            <td><span id="lblTotVisit">0</span></td>
+                            <td class="bg-light"><span id="lblTotKerja">0</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-12 mt-2">
+                <div class="d-flex justify-content-between text-center px-4" style="font-size: 12px;">
+                    <div style="width: 220px;">
+                        <p class="mb-5 pb-4">Dibuat Oleh,</p>
+                        <p class="fw-bold text-decoration-underline mb-0">( .................................... )</p>
+                        <p class="small mb-0 text-muted">Admin / HRD</p>
+                    </div>
+                    <div style="width: 220px;">
+                        <p class="mb-5 pb-4">Mengetahui,</p>
+                        <p class="fw-bold text-decoration-underline mb-0">( .................................... )</p>
+                        <p class="small mb-0 text-muted">Manager HRD</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-end mt-5 pt-3 no-print">
+            <button class="btn btn-success px-4 shadow me-2" onclick="downloadLaporanExcel()">
+                <i class="fas fa-file-excel me-2"></i> Excel
+            </button>
+            <button class="btn btn-danger px-4 shadow" onclick="window.print()">
+                <i class="fas fa-file-pdf me-2"></i> Ekspor PDF
+            </button>
+        </div>
+        
+    </div>
+</div>
+
+<div id="view-variabel-gaji" class="page-view no-print" style="display: none;">
+    
+    <div class="mb-3">
+        <button class="btn btn-secondary btn-sm shadow-sm" onclick="navigateTo('Absensi')">
+            <i class="fas fa-arrow-left me-1"></i> Kembali ke Dashboard Absensi
+        </button>
+    </div>
+    
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-warning text-dark fw-bold py-3" style="font-size: 0.95rem;">
+            <i class="fas fa-file-excel me-2"></i> Cetak Absensi Variabel Gaji (.xlsx)
+        </div>
+        <div class="card-body p-4 bg-white rounded-bottom">
+            <div class="row g-3 justify-content-center mb-4">
+                <div class="col-md-3">
+                    <label class="small fw-bold">Tanggal Mulai:</label>
+                    <input type="date" id="varTglMulai" class="form-control border-warning border-2 shadow-sm">
+                </div>
+                <div class="col-md-3">
+                    <label class="small fw-bold">Tanggal Selesai:</label>
+                    <input type="date" id="varTglAkhir" class="form-control border-warning border-2 shadow-sm">
+                </div>
+                <div class="col-md-3">
+                    <label class="small fw-bold">Filter Perusahaan:</label>
+                    <select id="varPilihPt" class="form-select border-warning border-2 shadow-sm">
+                        <option value="ALL">-- SEMUA PT --</option>
+                        <option value="KOBE">Kobexindo Tractors Tbk</option>
+                        <option value="KEX">Kobexindo Equipment</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="small fw-bold">Pilih Karyawan:</label>
+                    <input type="text" id="varPilihKaryawan" list="listKaryawanAll" class="form-control border-warning border-2 shadow-sm" placeholder="Ketik nama atau ALL">
+                    <datalist id="listKaryawanAll">
+                        <option value="ALL">ALL (Semua Karyawan)</option>
+                        </datalist>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <button class="btn btn-primary btn-lg px-5 shadow fw-bold" onclick="previewVariabelGaji()">
+                    <i class="fas fa-eye me-2"></i> Preview Data
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="areaPreviewGaji" style="display: none;" class="mt-4">
+        <div class="card shadow-sm border-0 p-4 pt-1 bg-white">
+            <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-3 mt-3">
+                <h5 class="fw-bold m-0 text-dark">Pratinjau Variabel Gaji</h5>
+                <div>
+                    <button class="btn btn-success btn-sm shadow-sm me-2" onclick="downloadVariabelGaji()">
+                        <i class="fas fa-file-excel me-1"></i> Download Excel
+                    </button>
+                    <button class="btn btn-danger btn-sm shadow-sm" onclick="window.print()">
+                        <i class="fas fa-file-pdf me-1"></i> Ekspor PDF
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover text-center align-middle" id="tblPreviewGaji">
+                    <thead class="bg-light table-dark text-white">
+                        <tr>
+                            <th width="10%">No</th>
+                            <th width="20%">NRPP</th>
+                            <th width="40%">Nama Karyawan</th>
+                            <th width="15%">Departemen</th>
+                            <th width="15%">Total Hadir</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyPreviewGaji" style="font-size: 13px;">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <?!= include('Js'); ?>
+</body>
+</html>
